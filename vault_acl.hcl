@@ -1,0 +1,3 @@
+key "vault/" {
+  policy = "write"
+}
