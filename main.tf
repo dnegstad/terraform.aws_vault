@@ -178,6 +178,11 @@ resource "aws_instance" "vault" {
     ]
   }
 
+  # Wait for consul to connect
+  provisioner "remote-exec" {
+    script = "${path.module}/wait_join.sh"
+  }
+
   provisioner "remote-exec" {
     inline = [
     "${template_file.vault_tls.rendered}"
