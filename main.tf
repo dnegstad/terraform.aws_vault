@@ -2,72 +2,16 @@ module "scripts" {
   source = "github.com/pk4media/terraform.scripts"
 }
 
-resource "aws_security_group" "server" {
-  name = "${var.name}-server"
-  description = "Vault server permissions."
-
-  vpc_id = "${var.vpc_id}"
-
-  tags {
-    Name = "${var.name}-server"
-    Environment = "${var.environment}"
-    Service = "vault"
-  }
-
-  ingress {
-    from_port = 8200
-    to_port   = 8200
-    protocol  = "tcp"
-    security_groups = ["${aws_security_group.client.id}"]
-  }
-
-  // Outbound internet access
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "client" {
-  name = "${var.name}-client"
-  description = "Vault client permissions."
-
-  vpc_id = "${var.vpc_id}"
-
-  tags {
-    Name = "${var.name}-client"
-    Environment = "${var.environment}"
-    Service = "vault"
-  }
-}
-
-module "consul_acl" {
-  source = "github.com/pk4media/terraform.consul_acl"
-
-  name   = "${var.name}"
-  id     = "${var.consul_acl_token}"
-  type   = "client"
-  rules  = "${file(concat(path.module, "/vault_acl.hcl"))}"
-
-  token  = "${var.consul_acl_register_token}"
-
-  host   = "${var.consul_host}"
-  user   = "${var.consul_user}"
-  private_key = "${var.consul_private_key}"
-
-  basion_host = "${var.bastion_host}"
-  bastion_user = "${var.bastion_user}"
-  bastion_private_key = "${var.bastion_private_key}"
-}
-
 resource "template_file" "install_ca" {
   template = "${file(module.scripts.ubuntu_install_ca)}"
 
   vars {
     name = "custom"
     ca   = "${var.ca}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -78,6 +22,10 @@ resource "template_file" "consul_tls" {
     cert = "${var.consul_tls_cert}"
     key  = "${var.consul_tls_key}"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "template_file" "consul_service" {
@@ -85,6 +33,10 @@ resource "template_file" "consul_service" {
 
   vars {
     name = "${var.name}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -96,8 +48,8 @@ resource "template_file" "consul" {
     atlas_token             = "${var.atlas_token}"
     atlas_username          = "${var.atlas_username}"
     atlas_environment       = "${var.atlas_environment}"
-    encryption              = "${var.encryption}"
-    acl_datacenter          = "${var.acl_datacenter}"
+    encryption              = "${var.consul_encryption}"
+    acl_datacenter          = "${var.consul_acl_datacenter}"
     acl_token               = "${var.consul_acl_token}"
   }
 
@@ -106,12 +58,16 @@ resource "template_file" "consul" {
   }
 }
 
-resource "template_file" "vault" {
+resource "template_file" "vault_tls" {
   template = "${file(module.scripts.ubuntu_vault_tls_setup)}"
 
   vars {
     cert = "${var.tls_cert}"
     key  = "${var.tls_key}"
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -136,15 +92,19 @@ resource "atlas_artifact" "vault" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = [
+    "version"
+    ]
   }
 }
 
 resource "aws_instance" "vault" {
   count         = "${length(split(",", var.private_subnets))}"
 
-  ami           = "${lookup(atlas_artifact.vault.metadata_full, concat("region-", var.region))}"
+  ami           = "${element(split(",", atlas_artifact.vault.metadata_full.ami_id), index(split(",", atlas_artifact.vault.metadata_full.region), var.region))}"
   instance_type = "${var.instance_type}"
   key_name      = "${var.ec2_key_name}"
+
   subnet_id     = "${element(split(",", var.subnet_ids), count.index)}"
   private_ip    = "${element(split(",", var.private_ips), count.index)}"
 
@@ -205,5 +165,14 @@ resource "aws_instance" "vault" {
 
   lifecycle {
     create_before_destroy = true
+    prevent_destroy       = true
+    ignore_changes = [
+    "ami",
+    "instance_type",
+    "key_name",
+    "private_ip",
+    "connection",
+    "provisioner"
+    ]
   }
 }
