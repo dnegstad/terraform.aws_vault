@@ -41,7 +41,7 @@ resource "template_file" "consul_service" {
 }
 
 resource "template_file" "consul" {
-  template = "${file(module.scripts.ubuntu_consul_setup)}"
+  template = "${file(module.scripts.ubuntu_consul_client_setup)}"
 
   vars {
     region                  = "${var.region}"
