@@ -62,11 +62,19 @@ module "consul_acl" {
   bastion_private_key = "${var.bastion_private_key}"
 }
 
+resource "template_file" "install_ca" {
+  template = "${file(module.scripts.ubuntu_install_ca)}"
+
+  vars {
+    name = "custom"
+    ca   = "${var.ca}"
+  }
+}
+
 resource "template_file" "consul_tls" {
   template = "${file(module.scripts.ubuntu_consul_tls_setup)}"
 
   vars {
-    ca   = "${var.consul_ca}"
     cert = "${var.consul_tls_cert}"
     key  = "${var.consul_tls_key}"
   }
@@ -163,22 +171,16 @@ resource "aws_instance" "vault" {
     bastion_private_key = "${var.bastion_private_key}"
   }
 
-  # Copy Consul certificates
   provisioner "remote-exec" {
     inline = [
-    "${template_file.consul_tls.rendered}"
+    "${template_file.install_ca.rendered}"
     ]
   }
 
   provisioner "remote-exec" {
     inline = [
-    "${template_file.consul_service.rendered}"
-    ]
-  }
-
-  # Provision the Consul server
-  provisioner "remote-exec" {
-    inline = [
+    "${template_file.consul_tls.rendered}",
+    "${template_file.consul_service.rendered}",
     "{template_file.consul.rendered}"
     ]
   }
@@ -204,18 +206,4 @@ resource "aws_instance" "vault" {
   lifecycle {
     create_before_destroy = true
   }
-}
-
-output "user" {
-  value = "${var.user}"
-}
-output "private_ips" {
-  value = "${join(",", aws_instance.consul.*.private_ip)}"
-}
-output "client_security_group_id" {
-  value = "${aws_security_group.client.id}"
-}
-
-output "consul_datacenter" {
-  value = "${var.region}"
 }

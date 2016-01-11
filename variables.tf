@@ -20,6 +20,8 @@ variable "subnet_ids" {}
 variable "private_subnets" {}
 variable "private_ips" {}
 
+variable "ca" {}
+
 variable "consul_host" {}
 variable "consul_user" {
   default = "ubuntu"
@@ -29,10 +31,12 @@ variable "consul_private_key" {}
 variable "consul_acl_register_token" {}
 variable "consul_agent_security_group_id" {}
 variable "consul_encryption" {}
+
 variable "consul_ca" {}
 variable "consul_tls_cert" {}
 variable "consul_tls_key" {}
-variable "conslu_acl_datacenter" {}
+
+variable "consul_acl_datacenter" {}
 variable "consul_acl_token" {
   default = ""
 }
