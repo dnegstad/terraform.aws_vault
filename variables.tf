@@ -28,7 +28,6 @@ variable "consul_agent_security_group_id" {}
 
 variable "ca" {}
 
-variable "consul_acl_register_token" {}
 variable "consul_encryption" {}
 
 variable "consul_ca" {}
