@@ -23,6 +23,7 @@ variable "private_ips" {}
 variable "ca" {}
 
 variable "consul_acl_register_token" {}
+variable "consul_server_security_group_id" {}
 variable "consul_agent_security_group_id" {}
 variable "consul_encryption" {}
 
