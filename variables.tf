@@ -27,6 +27,8 @@ variable "consul_agent_security_group_id" {}
 
 variable "ca" {}
 
+variable "consul_private_ips" {}
+
 variable "consul_encryption" {}
 
 variable "consul_ca" {}

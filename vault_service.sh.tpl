@@ -2,7 +2,7 @@
 
 METADATA_INSTANCE_ID=`curl http://169.254.169.254/2014-02-25/meta-data/instance-id`
 
-sudo cat <<EOF >/etc/consul.d/service.json
+sudo cat <<EOF >/opt/consul/config/service.json
 {
   "service": {
     "id": "${name}-$METADATA_INSTANCE_ID",

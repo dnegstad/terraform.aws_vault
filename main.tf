@@ -139,7 +139,7 @@ resource "aws_instance" "vault" {
     inline = [
     "${template_file.consul_tls.rendered}",
     "${template_file.consul_service.rendered}",
-    "{template_file.consul.rendered}"
+    "${template_file.consul.rendered}"
     ]
   }
 
