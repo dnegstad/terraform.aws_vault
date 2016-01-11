@@ -5,7 +5,7 @@ METADATA_INSTANCE_ID=`curl http://169.254.169.254/2014-02-25/meta-data/instance-
 sudo cat <<EOF >/etc/consul.d/service.json
 {
   "service": {
-    "id": "${name}-${METADATA_INSTANCE_ID}",
+    "id": "${name}-$METADATA_INSTANCE_ID",
     "name": "vault",
     "port": 8200,
     "tags": [
