@@ -164,13 +164,5 @@ resource "aws_instance" "vault" {
   lifecycle {
     create_before_destroy = true
     prevent_destroy       = true
-    ignore_changes = [
-    "ami",
-    "instance_type",
-    "key_name",
-    "private_ip",
-    "connection",
-    "provisioner"
-    ]
   }
 }
