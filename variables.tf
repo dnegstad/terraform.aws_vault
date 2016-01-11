@@ -23,11 +23,12 @@ variable "vpc_cidr" {}
 variable "subnet_ids" {}
 variable "private_ips" {}
 
+variable "server_security_group_id" {}
+variable "consul_agent_security_group_id" {}
+
 variable "ca" {}
 
 variable "consul_acl_register_token" {}
-variable "consul_server_security_group_id" {}
-variable "consul_agent_security_group_id" {}
 variable "consul_encryption" {}
 
 variable "consul_ca" {}

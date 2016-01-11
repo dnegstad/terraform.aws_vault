@@ -112,7 +112,7 @@ resource "aws_instance" "vault" {
 
   vpc_security_group_ids = [
     "${var.bastion_security_group_id}",
-    "${var.consul_server_security_group_id}",
+    "${var.server_security_group_id}",
     "${var.consul_agent_security_group_id}"
   ]
 
