@@ -93,9 +93,6 @@ resource "atlas_artifact" "vault" {
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [
-    "version"
-    ]
   }
 }
 
