@@ -124,6 +124,11 @@ resource "template_file" "vault" {
 resource "atlas_artifact" "vault" {
   name = "${var.atlas_username}/vault"
   type = "amazon.image"
+  version = "${var.ami_artifact_version}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_instance" "vault" {
