@@ -19,6 +19,7 @@ resource "template_file" "consul_tls" {
   template = "${file(module.scripts.ubuntu_consul_tls_setup)}"
 
   vars {
+    ca   = "${var.consul_ca}"
     cert = "${var.consul_tls_cert}"
     key  = "${var.consul_tls_key}"
   }
