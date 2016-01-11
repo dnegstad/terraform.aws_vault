@@ -22,12 +22,6 @@ variable "private_ips" {}
 
 variable "ca" {}
 
-variable "consul_host" {}
-variable "consul_user" {
-  default = "ubuntu"
-}
-variable "consul_private_key" {}
-
 variable "consul_acl_register_token" {}
 variable "consul_agent_security_group_id" {}
 variable "consul_encryption" {}
