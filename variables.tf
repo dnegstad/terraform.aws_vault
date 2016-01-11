@@ -10,6 +10,10 @@ variable "user" {
 
 variable "region" {}
 
+variable "nodes" {
+  default = "1"
+}
+
 variable "instance_type" {
   default = "t2.small"
 }
@@ -17,7 +21,6 @@ variable "instance_type" {
 variable "vpc_id" {}
 variable "vpc_cidr" {}
 variable "subnet_ids" {}
-variable "private_subnets" {}
 variable "private_ips" {}
 
 variable "ca" {}

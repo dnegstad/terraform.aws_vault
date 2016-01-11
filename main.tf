@@ -74,7 +74,7 @@ resource "template_file" "vault_tls" {
 resource "template_file" "vault" {
   template = "${file(module.scripts.ubuntu_vault_setup)}"
 
-  count = "${length(split(",", var.private_subnets))}"
+  count = "${var.nodes}"
 
   vars {
     private_ip = "${element(split(",", var.private_ips), count.index)}"
@@ -99,7 +99,7 @@ resource "atlas_artifact" "vault" {
 }
 
 resource "aws_instance" "vault" {
-  count         = "${length(split(",", var.private_subnets))}"
+  count         = "${var.nodes}"
 
   ami           = "${element(split(",", atlas_artifact.vault.metadata_full.ami_id), index(split(",", atlas_artifact.vault.metadata_full.region), var.region))}"
   instance_type = "${var.instance_type}"

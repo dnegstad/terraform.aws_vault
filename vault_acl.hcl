@@ -1,3 +1,0 @@
-key "vault/" {
-  policy = "write"
-}
