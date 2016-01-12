@@ -75,10 +75,8 @@ resource "template_file" "vault_tls" {
 resource "template_file" "vault" {
   template = "${file(module.scripts.ubuntu_vault_setup)}"
 
-  count = "${var.nodes}"
-
   vars {
-    private_ip = "${element(split(",", var.private_ips), count.index)}"
+    region = "${var.region}"
   }
 
   lifecycle {
@@ -157,7 +155,7 @@ resource "aws_instance" "vault" {
   # Provision the Vault server
   provisioner "remote-exec" {
     inline = [
-    "${element(template_file.vault.*.rendered, count.index)}"
+    "${template_file.vault.rendered}"
     ]
   }
 
